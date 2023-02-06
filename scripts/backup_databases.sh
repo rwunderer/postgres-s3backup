@@ -22,9 +22,6 @@ set -euo pipefail
 #   S3_ENDPOINT
 #   S3_BASEURL
 #
-# for cleaning up:
-#   DAYS_TO_KEEP
-#
 # volumes:
 # /mnt/backup-public-key.asc 
 
@@ -50,15 +47,3 @@ for db in $databases; do
         | ${GPG} \
         | aws s3 cp - --endpoint "${S3_ENDPOINT}" "${S3_FOLDER}/${FIL}"
 done
-
-#
-# clean up old backups
-if [ "${DAYS_TO_KEEP}" -gt "0" ]; then
-    EXPIRY_DATE="$(date +%Y%m%d -d "${DAYS_TO_KEEP} days ago")"
-
-    while read dat tim siz fil; do
-        if [ "${dat//-/}" -lt "${EXPIRY_DATE}" ]; then
-            aws s3 rm --endpoint "${S3_ENDPOINT}" "${S3_FOLDER}/${fil}"
-        fi
-    done < <(aws s3 ls --endpoint "${S3_ENDPOINT}" "${S3_FOLDER}/")
-fi
