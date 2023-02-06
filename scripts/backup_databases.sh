@@ -19,6 +19,7 @@ set -euo pipefail
 # for s3:
 #   AWS_ACCESS_KEY_ID
 #   AWS_SECRET_ACCESS_KEY
+#   S3_REGION
 #   S3_ENDPOINT
 #   S3_BASEURL
 #
@@ -45,5 +46,5 @@ for db in $databases; do
     pg_dump $db \
         | bzip2 -c \
         | ${GPG} \
-        | aws s3 cp - --endpoint "${S3_ENDPOINT}" "${S3_FOLDER}/${FIL}"
+        | aws s3 cp - --region "${S3_REGION}" --endpoint "${S3_ENDPOINT}" "${S3_FOLDER}/${FIL}"
 done
